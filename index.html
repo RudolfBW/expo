@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Electricity Price Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js" integrity="sha384-iAb5fCG23Dy3MI6JBctF/dQlSULH0bfQW6pMSccBAuoUV0uFSFqQtAEArYGQZYNO" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #0d1117;
+      --surface: rgba(255, 255, 255, 0.08);
+      --text: #f1f5f9;
+      --accent: #22d3ee;
+      --accent-soft: rgba(34, 211, 238, 0.15);
+      --warning: #f97316;
+      --muted: #94a3b8;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top, rgba(34, 211, 238, 0.2), transparent 60%), var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .card {
+      width: min(960px, 100%);
+      background: rgba(13, 17, 23, 0.85);
+      border-radius: 24px;
+      padding: 2.5rem;
+      box-shadow: 0 40px 60px rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 2rem;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: clamp(2rem, 3vw, 2.75rem);
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.03em;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    #chart-wrapper {
+      position: relative;
+      width: 100%;
+      height: clamp(320px, 55vh, 480px);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1.25rem;
+      margin-top: 2.5rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .stat-card span {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stat-card strong {
+      font-size: 1.75rem;
+      font-weight: 600;
+      line-height: 1.1;
+    }
+
+    .timeline {
+      margin-top: 3rem;
+      background: var(--surface);
+      border-radius: 18px;
+      padding: 1.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .insight {
+      margin-top: 2.5rem;
+      background: rgba(15, 23, 42, 0.55);
+      border-radius: 18px;
+      padding: 1.75rem;
+      border: 1px solid rgba(34, 211, 238, 0.25);
+      box-shadow: inset 0 1px 0 rgba(148, 163, 184, 0.15);
+    }
+
+    .insight h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+
+    .insight p {
+      margin: 0;
+      color: rgba(226, 232, 240, 0.9);
+      line-height: 1.6;
+    }
+
+    .timeline h2 {
+      margin: 0 0 1.25rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .timeline ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .timeline li {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid transparent;
+      transition: border-color 0.25s ease, transform 0.25s ease;
+    }
+
+    .timeline li.highlight {
+      border-color: rgba(34, 211, 238, 0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(34, 211, 238, 0.2);
+    }
+
+    .timeline li.cheapest {
+      border-color: rgba(34, 197, 94, 0.45);
+    }
+
+    .timeline li.priciest {
+      border-color: rgba(249, 115, 22, 0.45);
+    }
+
+    .timeline li.cheapest .price {
+      color: #4ade80;
+    }
+
+    .timeline li.priciest .price {
+      color: #fb923c;
+    }
+
+    .timeline time {
+      font-weight: 600;
+    }
+
+    .timeline .price {
+      font-weight: 600;
+    }
+
+    footer {
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 1.25rem;
+      }
+
+      .card {
+        padding: 1.75rem;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .timeline li {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+      }
+
+      footer {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <header>
+      <div>
+        <h1>Next 24h Electricity Price Outlook</h1>
+        <p>Live Nord Pool spot market data (Germany & Austria zone). Updated hourly.</p>
+      </div>
+      <p id="last-updated">Loading…</p>
+    </header>
+
+    <section id="chart-wrapper">
+      <canvas id="price-chart" aria-label="Electricity price forecast for the next 24 hours"></canvas>
+    </section>
+
+    <section class="stats" aria-live="polite">
+      <article class="stat-card">
+        <span>Current price</span>
+        <strong id="current-price">—</strong>
+        <small id="current-slot"></small>
+      </article>
+      <article class="stat-card">
+        <span>24h average</span>
+        <strong id="avg-price">—</strong>
+        <small id="avg-note">Across upcoming 24 hours</small>
+      </article>
+      <article class="stat-card">
+        <span>Cheapest hour</span>
+        <strong id="min-price">—</strong>
+        <small id="min-slot"></small>
+      </article>
+      <article class="stat-card">
+        <span>Most expensive hour</span>
+        <strong id="max-price">—</strong>
+        <small id="max-slot"></small>
+      </article>
+    </section>
+
+    <section class="insight" aria-live="polite">
+      <h2>Key takeaway</h2>
+      <p id="insight-text">The price insight will appear here once data is available.</p>
+    </section>
+
+    <section class="timeline" aria-live="polite">
+      <h2>Hourly breakdown</h2>
+      <ul id="hourly-list"></ul>
+    </section>
+
+    <footer>
+      Data source: <a href="https://www.awattar.de/services/market-data" target="_blank" rel="noopener" style="color: var(--accent);">awattar Marketdata API</a>.
+    </footer>
+  </main>
+
+  <script>
+    const API_ENDPOINT = 'https://api.awattar.de/v1/marketdata';
+    const HOUR_MS = 60 * 60 * 1000;
+    const chartContext = document.getElementById('price-chart').getContext('2d');
+    let priceChart;
+
+    function formatPrice(value) {
+      const numeric = Number.isFinite(value) ? value : 0;
+      return `${numeric.toFixed(2)} ct/kWh`;
+    }
+
+    function formatTime(date) {
+      return date.toLocaleString(undefined, {
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function setLastUpdated(date) {
+      document.getElementById('last-updated').textContent = `Last updated ${date.toLocaleString()}`;
+    }
+
+    function buildGradient(ctx, area) {
+      const gradient = ctx.createLinearGradient(0, area.bottom, 0, area.top);
+      gradient.addColorStop(0, 'rgba(34, 211, 238, 0.05)');
+      gradient.addColorStop(1, 'rgba(34, 211, 238, 0.35)');
+      return gradient;
+    }
+
+    async function fetchPrices() {
+      const now = new Date();
+      const start = now.getTime();
+      const end = start + 24 * HOUR_MS;
+      const url = `${API_ENDPOINT}?start=${start}&end=${end}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`API responded with status ${response.status}`);
+        }
+        const { data } = await response.json();
+        if (!Array.isArray(data)) {
+          throw new Error('Unexpected response format');
+        }
+        const filtered = data
+          .filter(item => item.start_timestamp >= start && item.start_timestamp < end)
+          .sort((a, b) => a.start_timestamp - b.start_timestamp);
+
+        updateDashboard(filtered);
+        setLastUpdated(now);
+      } catch (error) {
+        console.error('Failed to load prices', error);
+        document.getElementById('last-updated').textContent = 'Failed to load data. Retrying in 1 hour…';
+      }
+    }
+
+    function updateDashboard(entries) {
+      if (!entries.length) {
+        document.getElementById('last-updated').textContent = 'No price information available for the upcoming 24 hours.';
+        return;
+      }
+
+      const labels = entries.map(entry => formatTime(new Date(entry.start_timestamp)));
+      const prices = entries.map(entry => entry.marketprice / 10);
+      const currencyUnit = 'ct/kWh';
+
+      const now = Date.now();
+      let currentEntry = entries.find(entry => now >= entry.start_timestamp && now < entry.end_timestamp);
+      if (!currentEntry) {
+        currentEntry = entries[0];
+      }
+
+      const avg = prices.reduce((sum, value) => sum + value, 0) / prices.length;
+      const minValue = Math.min(...prices);
+      const maxValue = Math.max(...prices);
+      const minEntry = entries[prices.indexOf(minValue)];
+      const maxEntry = entries[prices.indexOf(maxValue)];
+
+      const currentPrice = currentEntry.marketprice / 10;
+
+      document.getElementById('current-price').textContent = formatPrice(currentPrice);
+      document.getElementById('current-slot').textContent = `${formatTime(new Date(currentEntry.start_timestamp))} – ${formatTime(new Date(currentEntry.end_timestamp))}`;
+      document.getElementById('avg-price').textContent = formatPrice(avg);
+      document.getElementById('min-price').textContent = formatPrice(minValue);
+      document.getElementById('max-price').textContent = formatPrice(maxValue);
+      document.getElementById('min-slot').textContent = `${formatTime(new Date(minEntry.start_timestamp))} – ${formatTime(new Date(minEntry.end_timestamp))}`;
+      document.getElementById('max-slot').textContent = `${formatTime(new Date(maxEntry.start_timestamp))} – ${formatTime(new Date(maxEntry.end_timestamp))}`;
+
+      const delta = currentPrice - avg;
+      const deltaPercentage = avg ? (delta / avg) * 100 : 0;
+      const deltaPercentageText = Number.isFinite(deltaPercentage) ? `${Math.abs(deltaPercentage).toFixed(1)}%` : null;
+      const insightParts = [];
+
+      if (Math.abs(delta) < 0.1) {
+        insightParts.push(`The market is remarkably stable right now at ${formatPrice(currentPrice)}, almost on par with the daily average.`);
+      } else if (delta > 0) {
+        const suffix = deltaPercentageText ? `, a ${deltaPercentageText} uptick.` : '.';
+        insightParts.push(`The current price of ${formatPrice(currentPrice)} is ${Math.abs(delta).toFixed(2)} ct/kWh higher than the 24h average (${formatPrice(avg)})${suffix}`);
+      } else {
+        const suffix = deltaPercentageText ? `, or ${deltaPercentageText} cheaper.` : '.';
+        insightParts.push(`Good news: the current price of ${formatPrice(currentPrice)} sits ${Math.abs(delta).toFixed(2)} ct/kWh below the daily average (${formatPrice(avg)})${suffix}`);
+      }
+
+      if (currentEntry === minEntry) {
+        insightParts.push('You are currently in the cheapest hour of the day — now is the time for energy-intensive tasks.');
+      } else if (currentEntry === maxEntry) {
+        insightParts.push('This is the priciest hour ahead. Consider shifting flexible consumption until later.');
+      } else {
+        insightParts.push(`Plan ahead: the cheapest slot arrives around ${formatTime(new Date(minEntry.start_timestamp))}, while prices peak near ${formatTime(new Date(maxEntry.start_timestamp))}.`);
+      }
+
+      document.getElementById('insight-text').textContent = insightParts.join(' ');
+
+      const hourlyList = document.getElementById('hourly-list');
+      hourlyList.innerHTML = '';
+      entries.forEach(entry => {
+        const li = document.createElement('li');
+        const entryStart = new Date(entry.start_timestamp);
+        const price = entry.marketprice / 10;
+        const rawWidth = maxValue ? (price / maxValue) * 100 : 0;
+        const relativeWidth = Math.min(100, Math.max(rawWidth, price > 0 ? 4 : 0));
+        li.innerHTML = `
+          <time>${formatTime(entryStart)}</time>
+          <div class="bar" aria-hidden="true">
+            <div style="height:4px;width:100%;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;">
+              <span style="display:block;height:100%;width:${relativeWidth}%;background:linear-gradient(90deg, rgba(34, 211, 238, 0.3), rgba(56, 189, 248, 0.6));"></span>
+            </div>
+          </div>
+          <span class="price">${formatPrice(price)}</span>`;
+        if (entry === minEntry) {
+          li.classList.add('highlight', 'cheapest');
+          li.setAttribute('aria-label', `Cheapest hour ${formatTime(entryStart)} with price ${formatPrice(price)}`);
+        }
+        if (entry === maxEntry) {
+          li.classList.add('highlight', 'priciest');
+          li.setAttribute('aria-label', `Most expensive hour ${formatTime(entryStart)} with price ${formatPrice(price)}`);
+        }
+        hourlyList.appendChild(li);
+      });
+
+      if (!priceChart) {
+        priceChart = new Chart(chartContext, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{
+              label: `Spot price (${currencyUnit})`,
+              data: prices,
+              tension: 0.35,
+              fill: true,
+              pointRadius: 5,
+              pointHoverRadius: 8,
+              pointBackgroundColor: ({ parsed }) => parsed.y === minValue ? '#22d3ee' : parsed.y === maxValue ? '#f97316' : '#0ea5e9',
+              pointBorderColor: 'rgba(255, 255, 255, 0.25)',
+              borderWidth: 3,
+              borderColor: '#38bdf8',
+              backgroundColor: (context) => {
+                const { chart } = context;
+                const { ctx, chartArea } = chart;
+                if (!chartArea) {
+                  return 'rgba(34, 211, 238, 0.2)';
+                }
+                return buildGradient(ctx, chartArea);
+              }
+            },
+            {
+              label: `24h average (${currencyUnit})`,
+              data: prices.map(() => avg),
+              borderColor: 'rgba(248, 113, 113, 0.6)',
+              borderWidth: 2,
+              borderDash: [8, 6],
+              pointRadius: 0,
+              fill: false
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                ticks: {
+                  maxRotation: 45,
+                  minRotation: 45,
+                  color: 'rgba(226, 232, 240, 0.8)'
+                },
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  color: 'rgba(226, 232, 240, 0.8)',
+                  callback: value => `${value.toFixed(0)} ct`
+                },
+                grid: {
+                  color: 'rgba(148, 163, 184, 0.15)'
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                labels: {
+                  color: 'rgba(226, 232, 240, 0.9)'
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                borderColor: 'rgba(148, 163, 184, 0.2)',
+                borderWidth: 1,
+                callbacks: {
+                  label: context => `${formatPrice(context.parsed.y)}`
+                }
+              }
+            }
+          }
+        });
+      } else {
+        priceChart.data.labels = labels;
+        priceChart.data.datasets[0].data = prices;
+        priceChart.data.datasets[1].data = prices.map(() => avg);
+        priceChart.update();
+      }
+    }
+
+    fetchPrices();
+    setInterval(fetchPrices, HOUR_MS);
+  </script>
+</body>
+</html>
