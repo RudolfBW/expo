@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PaperPages</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.3.0/build/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand">
+        <span class="logo">📄</span>
+        <div>
+          <h1>PaperPages</h1>
+          <p>Pages-inspired editor with DOCX import/export.</p>
+        </div>
+      </div>
+      <div class="status" id="status">Ready</div>
+    </header>
+
+    <main class="workspace">
+      <aside class="toolbar">
+        <button class="primary" id="new-doc">New</button>
+        <button id="open-doc">Open .docx</button>
+        <button id="export-doc">Export .docx</button>
+        <div class="divider"></div>
+        <button data-command="bold"><strong>B</strong></button>
+        <button data-command="italic"><em>I</em></button>
+        <button data-command="underline"><span class="underline">U</span></button>
+        <button data-command="insertUnorderedList">• List</button>
+        <button data-command="justifyLeft">Left</button>
+        <button data-command="justifyCenter">Center</button>
+        <button data-command="justifyRight">Right</button>
+        <div class="divider"></div>
+        <button data-heading="H1">Title</button>
+        <button data-heading="H2">Heading</button>
+        <button data-heading="P">Body</button>
+        <div class="divider"></div>
+        <label class="field">
+          Font size
+          <select id="font-size">
+            <option value="12">12</option>
+            <option value="14" selected>14</option>
+            <option value="16">16</option>
+            <option value="18">18</option>
+            <option value="24">24</option>
+            <option value="32">32</option>
+          </select>
+        </label>
+        <label class="field">
+          Page width
+          <select id="page-width">
+            <option value="800" selected>Normal</option>
+            <option value="900">Wide</option>
+            <option value="700">Narrow</option>
+          </select>
+        </label>
+      </aside>
+
+      <section class="document-area">
+        <div class="page-shadow">
+          <article id="editor" class="page" contenteditable="true">
+            <h1>Welcome to PaperPages</h1>
+            <p>
+              Start typing to create a document. Use the toolbar to style text, then
+              export as a Word document when you're ready.
+            </p>
+            <h2>Pages-like flow</h2>
+            <p>
+              This editor keeps a clean, paper-like canvas, helpful spacing, and keyboard-friendly
+              commands so it feels familiar to Pages users.
+            </p>
+            <ul>
+              <li>Open existing .docx files.</li>
+              <li>Format headings and body text.</li>
+              <li>Export to Word-compatible .docx.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <input type="file" id="file-input" accept=".docx" hidden />
+
+    <script src="app.js"></script>
+  </body>
+</html>
