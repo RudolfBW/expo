@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Energy Stack — Financial Viability</title>
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --card: #ffffff;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --accent: #0071e3;
+      --good: #1d9f54;
+      --warn: #c46b00;
+      --shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+      --radius: 28px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at 20% 10%, #fff 0%, var(--bg) 45%);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      width: min(1200px, calc(100vw - 64px));
+      height: min(700px, calc(100vh - 96px));
+      margin: 48px auto;
+      background: linear-gradient(180deg, #fff 0%, #fbfbfd 100%);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 56px;
+      display: none;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+    }
+
+    .slide.active { display: grid; }
+
+    .eyebrow {
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 650;
+    }
+
+    h1, h2 {
+      margin: 0;
+      line-height: 1.06;
+      letter-spacing: -0.02em;
+      font-weight: 720;
+    }
+
+    h1 { font-size: clamp(2rem, 4.8vw, 4.2rem); }
+    h2 { font-size: clamp(1.7rem, 3.2vw, 2.8rem); }
+
+    p, li {
+      color: var(--muted);
+      font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .lead {
+      font-size: clamp(1.2rem, 2.2vw, 1.65rem);
+      color: #2d2d2f;
+      max-width: 90%;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid #ececf0;
+      border-radius: 20px;
+      padding: 20px 22px;
+      background: #fff;
+    }
+
+    .panel h3 {
+      margin: 0 0 10px 0;
+      font-size: 1.15rem;
+      color: var(--text);
+    }
+
+    ul { margin: 0; padding-left: 1.2rem; }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .kpi {
+      background: #fff;
+      border-radius: 18px;
+      padding: 16px;
+      border: 1px solid #ececf0;
+    }
+
+    .kpi .value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .kpi .label { font-size: 0.95rem; color: var(--muted); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 16px;
+      overflow: hidden;
+      font-size: 1rem;
+      background: #fff;
+      border: 1px solid #ececf0;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f0f0f3;
+      text-align: left;
+    }
+
+    th {
+      background: #fafafd;
+      color: #444;
+      font-weight: 640;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .good { color: var(--good); font-weight: 640; }
+    .warn { color: var(--warn); font-weight: 640; }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .controls {
+      position: fixed;
+      right: 28px;
+      bottom: 28px;
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid #d9d9df;
+      background: #fff;
+      color: #333;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+
+    @media (max-width: 980px) {
+      .slide { padding: 34px; }
+      .grid-2, .kpis { grid-template-columns: 1fr; }
+      .lead { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck">
+    <section class="slide active">
+      <div>
+        <div class="eyebrow">Home Energy Investment Brief</div>
+        <h1>Solar + Battery + Heat Pump</h1>
+      </div>
+      <p class="lead">A premium, all-electric home energy stack can lower lifetime energy cost, reduce grid risk, and improve resale value — if it is sized and financed correctly.</p>
+      <div class="footer"><span>Prepared for homeowners evaluating ROI</span><span>1 / 8</span></div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">What You’re Buying</div>
+        <h2>Three systems that work better together</h2>
+      </div>
+      <div class="grid-2">
+        <article class="panel">
+          <h3>Solar PV</h3>
+          <ul>
+            <li>Generates low-cost electricity during daytime.</li>
+            <li>Offsets utility purchases and hedges rate inflation.</li>
+            <li>Best economics when self-consumed or net-metered well.</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3>Battery Storage</h3>
+          <ul>
+            <li>Shifts excess solar into evening peak periods.</li>
+            <li>Enables backup during outages.</li>
+            <li>Can optimize time-of-use tariffs and demand charges.</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3>Heat Pump HVAC / Water Heating</h3>
+          <ul>
+            <li>Replaces combustion with high-efficiency electrification.</li>
+            <li>Turns solar electricity into heating/cooling value.</li>
+            <li>Reduces gas bill and future carbon compliance risk.</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3>Why the combination matters</h3>
+          <ul>
+            <li>Heat pump increases electric load that solar can serve.</li>
+            <li>Battery raises self-consumption of PV generation.</li>
+            <li>Together they improve total-system payback stability.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="footer"><span>Integration drives value</span><span>2 / 8</span></div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Financial Baseline</div>
+        <h2>Reference homeowner profile (illustrative)</h2>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="value">12,500</div><div class="label">kWh annual electric use</div></div>
+        <div class="kpi"><div class="value">$0.29</div><div class="label">Average retail rate per kWh</div></div>
+        <div class="kpi"><div class="value">3.5%</div><div class="label">Utility rate inflation assumption</div></div>
+        <div class="kpi"><div class="value">7 kW</div><div class="label">Solar array size</div></div>
+      </div>
+      <div class="panel">
+        <ul>
+          <li>Battery: 13.5 kWh usable capacity (single unit class).</li>
+          <li>Heat pump: replaces gas furnace + old AC, COP-weighted seasonal efficiency improvement.</li>
+          <li>Discount rate for NPV: 5% real.</li>
+          <li>Model horizon: 15 years with battery replacement reserve in year 13–15 sensitivity case.</li>
+        </ul>
+      </div>
+      <div class="footer"><span>Inputs should be localized before final decision</span><span>3 / 8</span></div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Upfront Economics</div>
+        <h2>Installed cost and incentives</h2>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Component</th><th>Gross Cost</th><th>Representative Incentive</th><th>Net Cost</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>7 kW Solar PV</td><td>$21,000</td><td>30% federal tax credit</td><td>$14,700</td></tr>
+          <tr><td>13.5 kWh Battery</td><td>$13,000</td><td>30% federal tax credit</td><td>$9,100</td></tr>
+          <tr><td>Heat Pump HVAC</td><td>$14,000</td><td>Tax credit + utility rebate</td><td>$11,500</td></tr>
+          <tr><th>Total</th><th>$48,000</th><th>Blended incentive value: $12,700</th><th>$35,300</th></tr>
+        </tbody>
+      </table>
+      <p>Note: Incentive structures vary by ZIP code, utility territory, tax appetite, and equipment eligibility.</p>
+      <div class="footer"><span>Always verify local program rules before purchase</span><span>4 / 8</span></div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Operating Cash Flow</div>
+        <h2>Annual savings stack</h2>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <h3>Value creation (Year 1)</h3>
+          <ul>
+            <li>Solar bill offset: <span class="good">+$2,350</span></li>
+            <li>Battery TOU arbitrage + demand control: <span class="good">+$620</span></li>
+            <li>Gas spend avoided from heat pump conversion: <span class="good">+$710</span></li>
+            <li>Maintenance delta: <span class="warn">−$180</span></li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Net annual benefit</h3>
+          <p class="lead" style="font-size:2rem;margin:0 0 8px 0;">$3,500</p>
+          <p>Escalates with utility inflation and tariff dynamics. Degrades modestly with panel and battery aging.</p>
+        </div>
+      </div>
+      <div class="footer"><span>Cash flow quality depends on self-consumption ratio</span><span>5 / 8</span></div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Viability Results</div>
+        <h2>Base, upside, and downside scenarios</h2>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Scenario</th><th>Simple Payback</th><th>15-yr NPV</th><th>IRR</th><th>Comment</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Downside</td><td>13.2 years</td><td>$1,900</td><td>5.7%</td><td>Lower rebates + weak export rate</td></tr>
+          <tr><td>Base Case</td><td>9.8 years</td><td>$13,600</td><td>10.8%</td><td>Balanced tariff and normal load match</td></tr>
+          <tr><td>Upside</td><td>7.4 years</td><td>$26,400</td><td>15.1%</td><td>High TOU spread + strong electrification savings</td></tr>
+        </tbody>
+      </table>
+      <p>In most modeled cases, the integrated system competes favorably with long-term utility-only spending.</p>
+      <div class="footer"><span>Decision threshold: compare IRR vs your alternative use of capital</span><span>6 / 8</span></div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Key Risks</div>
+        <h2>What can erode ROI — and how to protect it</h2>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <h3>Risk factors</h3>
+          <ul>
+            <li>Policy change in export compensation or tax credits.</li>
+            <li>Poor system sizing (overproduction, underused battery).</li>
+            <li>Heat pump underperformance due to duct or envelope issues.</li>
+            <li>Installer quality and warranty service reliability.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Mitigations</h3>
+          <ul>
+            <li>Run hourly interval-data model before signing contract.</li>
+            <li>Require performance guarantees and production modeling assumptions in writing.</li>
+            <li>Bundle envelope upgrades to increase heat pump efficiency.</li>
+            <li>Finance with terms shorter than expected payback where possible.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer"><span>Execution quality matters as much as equipment quality</span><span>7 / 8</span></div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Recommendation</div>
+        <h2>Financially viable when designed as one system</h2>
+      </div>
+      <div class="panel">
+        <p class="lead">Proceed to a site-specific feasibility model if your expected simple payback is under 11 years and your 15-year IRR exceeds your personal hurdle rate.</p>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <h3>Next 30 days</h3>
+          <ul>
+            <li>Collect 12 months electric + gas bills.</li>
+            <li>Request interval load data from utility.</li>
+            <li>Get 3 bids with identical equipment scope.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Decision criteria</h3>
+          <ul>
+            <li>Net cost after incentives.</li>
+            <li>Modeled annual savings under current tariff.</li>
+            <li>Warranty coverage and installer bankability.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer"><span>Thank you</span><span>8 / 8</span></div>
+    </section>
+  </main>
+
+  <div class="controls" aria-label="Slide controls">
+    <button id="prev" aria-label="Previous slide">←</button>
+    <button id="next" aria-label="Next slide">→</button>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const prev = document.getElementById('prev');
+    const next = document.getElementById('next');
+    let index = 0;
+
+    const render = () => {
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+    };
+
+    const step = (delta) => {
+      index = (index + delta + slides.length) % slides.length;
+      render();
+    };
+
+    prev.addEventListener('click', () => step(-1));
+    next.addEventListener('click', () => step(1));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight' || event.key === 'PageDown') step(1);
+      if (event.key === 'ArrowLeft' || event.key === 'PageUp') step(-1);
+    });
+  </script>
+</body>
+</html>
